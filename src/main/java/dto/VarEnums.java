@@ -10,4 +10,5 @@ public class VarEnums {
 
     public final static InetSocketAddress server1 = new InetSocketAddress("",0);
     public final static InetSocketAddress server2 = new InetSocketAddress("",0);
+
 }
