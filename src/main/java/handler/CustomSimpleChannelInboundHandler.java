@@ -5,6 +5,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import pojo.StunMsg;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,7 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
                 if(!channelFuture.isSuccess() && times<3) {
                     _writeOnFail(channel, msg, times + 1);
-                }else{
+                }else if(!channelFuture.isSuccess()){
                     if(channel.isActive()){
                         System.out.println("客户端发送消息失败,关闭连接。");
                         channel.close();
@@ -71,9 +72,15 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, StunMsg stunMsg) throws Exception {
-        if(stunMsg.getRes()==1) {
+        if(stunMsg.isRes()) {
             cancelReadTimeout(channelHandlerContext.channel());
+        }else{
+            //发送返回报文
+            InetSocketAddress addr = (InetSocketAddress) channelHandlerContext.channel().remoteAddress();
+            StunMsg msg = new StunMsg(addr);
+            writeOnFail(channelHandlerContext.channel(),msg);
         }
+
         handle(channelHandlerContext,stunMsg);
     }
 

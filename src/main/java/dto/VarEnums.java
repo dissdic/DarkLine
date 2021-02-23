@@ -9,6 +9,9 @@ public class VarEnums {
     public final static AttributeKey<InetSocketAddress> remoteAddr = AttributeKey.newInstance("remoteAddr");
 
     public final static InetSocketAddress server1 = new InetSocketAddress("",0);
-    public final static InetSocketAddress server2 = new InetSocketAddress("",0);
+    public final static InetSocketAddress server2 = new InetSocketAddress("1",0);
+
+    public final static InetSocketAddress server3 = new InetSocketAddress("",0);
+
 
 }

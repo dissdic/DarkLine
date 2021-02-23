@@ -7,12 +7,16 @@ import java.util.Date;
 
 public class StunMsg {
 
+    public StunMsg(InetSocketAddress addr,Channel channel){
+        new StunMsg(addr.getHostString(),addr.getPort(),channel,addr);
+    }
+
     public StunMsg(Channel channel,InetSocketAddress addr){
         InetSocketAddress another = (InetSocketAddress) channel.localAddress();
         new StunMsg(another.getHostString(),another.getPort(),channel,addr);
     }
 
-    public StunMsg(String host,int port,Channel channel) {
+    private StunMsg(String host,int port,Channel channel) {
         this.host=host;
         this.port=port;
         this.times=0;
@@ -23,6 +27,12 @@ public class StunMsg {
     public StunMsg(String host,int port,Channel channel,InetSocketAddress addr){
         new StunMsg(host,port,channel);
         this.addr = addr;
+    }
+
+    //一个返回报文
+    public StunMsg(InetSocketAddress addr){
+        this.addr = addr;
+        this.res = 1;
     }
 
     private int port;
@@ -40,13 +50,10 @@ public class StunMsg {
         return this;
     }
 
+
+
     public int plusTimes(){
         return this.times+=1;
-    }
-
-    public StunMsg response(){
-        this.res = 1;
-        return this;
     }
 
     public boolean isRes(){

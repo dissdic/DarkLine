@@ -3,19 +3,19 @@ package code.stun;
 import handler.StunUdpMsgEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioDatagramChannel;
 import handler.StunUdpMsgDecoder;
 import code.stun.handler.StunUdpMsgHandler;
-
-import java.net.InetSocketAddress;
-
+/**
+ * 监听者
+*/
 public class StunServer {
 
     private StunServer(){
         this.group = new NioEventLoopGroup();
         this.bootstrap = new Bootstrap();
-        bootstrap.group(group).channel(NioDatagramChannel.class)
+        bootstrap.group(group).channel(EpollDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST,true)
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
@@ -27,12 +27,19 @@ public class StunServer {
                     }
                 });
     }
+
+    private static StunServer instance = new StunServer();
+
+    public static StunServer getInstance(){
+        return instance;
+    }
+
     private final Bootstrap bootstrap;
     private final EventLoopGroup group;
 
 
-    public Channel getChannel(InetSocketAddress addr,int port){
-        ChannelFuture channelFuture = bootstrap.localAddress(addr).bind().addListener(new ChannelFutureListener() {
+    public Channel getChannel(int port){
+        ChannelFuture channelFuture = bootstrap.bind(port).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
                 if(!channelFuture.isSuccess()){

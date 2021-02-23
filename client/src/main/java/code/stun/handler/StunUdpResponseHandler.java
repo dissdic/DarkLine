@@ -1,61 +1,69 @@
 package code.stun.handler;
 
+import dto.StunMsgBizType;
 import dto.VarEnums;
 import handler.CustomSimpleChannelInboundHandler;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import pojo.StunMsg;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class StunUdpResponseHandler extends CustomSimpleChannelInboundHandler {
 
-    private InetSocketAddress preNat;
+    private InetSocketAddress ipAndPort;
+
+    private Boolean canChangePort;
+    private Boolean canChangeHost;
+
+    private ScheduledFuture<?> future = null;
 
     @Override
     protected void handle(ChannelHandlerContext ctx, StunMsg stunMsg) throws Exception {
+        Channel channel = ctx.channel();
 
-
-        InetSocketAddress localAddr = (InetSocketAddress) ctx.channel().localAddress();
-        InetSocketAddress remoteAddr = (InetSocketAddress) ctx.channel().remoteAddress();
+        InetSocketAddress localAddr = (InetSocketAddress) channel.localAddress();
+        InetSocketAddress remoteAddr = (InetSocketAddress) channel.remoteAddress();
         InetSocketAddress responseAddr = new InetSocketAddress(stunMsg.getHost(),stunMsg.getPort());
 
         System.out.println(localAddr.toString());
         System.out.println(remoteAddr.toString());
         System.out.println(responseAddr.toString());
 
-        StunMsg msg = new StunMsg(localAddr.getHostString(),localAddr.getPort(),ctx.channel());
-
-        if(localAddr.equals(responseAddr)){
-            System.out.println("公网客户端");
-        }else if(preNat!=null){
-            if(preNat.equals(responseAddr)){
-                //限制和端口限制
-                System.out.println("全锥型NAT");
+        int bizType = stunMsg.getBiz();
+        if(bizType==StunMsgBizType.NAT_ADDRESS.type){
+            if(localAddr.equals(responseAddr)){
+                System.out.println("公网客户端");
             }else{
-                System.out.println("对称型NAT");
-            }
-        }else{
-
-            preNat = responseAddr;
-            writeOnRetry(ctx.channel(),msg);
-
-            ChannelFuture channelFuture = ctx.channel().connect(VarEnums.server2).addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    if(!channelFuture.isSuccess()){
-                        channelFuture.cause().printStackTrace();
-                        channelFuture.channel().close();
+                ipAndPort = responseAddr;
+                //开启定时器
+                future = channel.eventLoop().schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        //30秒后这块代码被执行，代表服务端换了端口不行
+                        canChangePort = false;
+                        StunMsg msg = new StunMsg(channel,VarEnums.server2).biz(StunMsgBizType.CHANGE_PORT.type);
+                        writeOnRetry(channel,msg);
                     }
-                }
-            }).syncUninterruptibly();
-            System.out.println("old channel:"+ctx.channel());
-            System.out.println("new channel:"+channelFuture.channel());
+                },30, TimeUnit.SECONDS);
 
-            channelFuture.channel().writeAndFlush(msg);
+            }
+        }else if(bizType==StunMsgBizType.PORT_LIMIT.type){
+            if(future!=null){
+                //立即取消定时任务
+                future.cancel(false);
+            }
+            canChangePort = true;
 
+            System.out.println("");
         }
+
     }
 
 

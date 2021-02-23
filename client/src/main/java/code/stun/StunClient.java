@@ -4,18 +4,21 @@ import dto.VarEnums;
 import handler.StunUdpMsgEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
 import java.net.InetSocketAddress;
-
+/**
+ * 广播者
+*/
 public class StunClient {
     //为了防止NAT端口老化，需要加个定时监听器?
     private StunClient(){
         this.bootstrap = new Bootstrap();
         this.group = new NioEventLoopGroup();
         bootstrap.group(group)
-                .channel(NioDatagramChannel.class)
+                .channel(EpollDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST,true)
                 .handler(new StunUdpMsgEncoder());
     }
