@@ -31,7 +31,7 @@ public class StunClient {
     }
 
     public Channel getChannel(InetSocketAddress addr,int port){
-        ChannelFuture channelFuture = bootstrap.attr(VarEnums.remoteAddr,addr).bind(port).addListener(new ChannelFutureListener() {
+        ChannelFuture channelFuture = bootstrap.bind(port).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
                 System.out.println("初始化客户端失败");

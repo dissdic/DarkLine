@@ -9,6 +9,8 @@ public class StunMsg {
         new StunMsg(addr.getHostString(),addr.getPort(),addr);
     }
 
+    public StunMsg(){}
+
     private StunMsg(String host,int port) {
         this.host=host;
         this.port=port;

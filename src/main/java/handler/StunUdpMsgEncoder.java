@@ -16,18 +16,14 @@ public class StunUdpMsgEncoder extends MessageToMessageEncoder<StunMsg> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, StunMsg msg, List<Object> list) throws Exception {
         GeneralUtil.nullThrow(msg);
-        InetSocketAddress addr = channelHandlerContext.channel().attr(VarEnums.remoteAddr).get();
-        if(addr==null){
-            addr = msg.getAddr();
-        }
-        GeneralUtil.nullThrow(addr);
-
         ByteBuf byteBuf = channelHandlerContext.alloc().heapBuffer();
         CharSequence sequence = msg.getHost();
         byteBuf.writeCharSequence(sequence, CharsetUtil.UTF_8);
         byteBuf.writeChar(StunMsg.seq());
         byteBuf.writeInt(msg.getPort());
-        DatagramPacket packet = new DatagramPacket(byteBuf,addr);
+        byteBuf.writeInt(msg.getRes());
+        byteBuf.writeInt(msg.getBiz());
+        DatagramPacket packet = new DatagramPacket(byteBuf,msg.getAddr());
         list.add(packet);
     }
 }

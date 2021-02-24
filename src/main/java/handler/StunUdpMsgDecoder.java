@@ -18,11 +18,19 @@ public class StunUdpMsgDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf content = datagramPacket.content();
         StringBuilder host = new StringBuilder();
         int port;
+        int res;
+        int biz;
         while (content.readableBytes()>0){
             char ch = content.readChar();
             if(ch == StunMsg.seq()){
                 port = content.readInt();
-                StunMsg msg = new StunMsg(host.toString(),port);
+                res = content.readInt();
+                biz = content.readInt();
+                StunMsg msg = new StunMsg();
+                msg.setHost(host.toString());
+                msg.setPort(port);
+                msg.setRes(res);
+                msg.setBiz(biz);
                 list.add(msg);
                 break;
             }else{
