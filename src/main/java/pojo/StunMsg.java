@@ -1,38 +1,29 @@
 package pojo;
 
-import io.netty.channel.Channel;
-
 import java.net.InetSocketAddress;
 import java.util.Date;
 
 public class StunMsg {
 
-    public StunMsg(InetSocketAddress addr,Channel channel){
-        new StunMsg(addr.getHostString(),addr.getPort(),channel,addr);
+    public StunMsg(InetSocketAddress addr){
+        new StunMsg(addr.getHostString(),addr.getPort(),addr);
     }
 
-    public StunMsg(Channel channel,InetSocketAddress addr){
-        InetSocketAddress another = (InetSocketAddress) channel.localAddress();
-        new StunMsg(another.getHostString(),another.getPort(),channel,addr);
-    }
-
-    private StunMsg(String host,int port,Channel channel) {
+    private StunMsg(String host,int port) {
         this.host=host;
         this.port=port;
         this.times=0;
-        this.channel = channel;
         this.res = 0;
     }
 
-    public StunMsg(String host,int port,Channel channel,InetSocketAddress addr){
-        new StunMsg(host,port,channel);
+    public StunMsg(String host,int port,InetSocketAddress addr){
+        new StunMsg(host,port);
         this.addr = addr;
     }
 
-    //一个返回报文
-    public StunMsg(InetSocketAddress addr){
-        this.addr = addr;
+    public StunMsg res(){
         this.res = 1;
+        return this;
     }
 
     private int port;
@@ -40,7 +31,6 @@ public class StunMsg {
     private InetSocketAddress addr;
     private final static char seq=':';
     private int times;
-    private Channel channel;
     //是否是返回报文
     private int res;
     private int biz;
@@ -86,14 +76,6 @@ public class StunMsg {
 
     public void setAddr(InetSocketAddress addr) {
         this.addr = addr;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
     }
 
     public int getTimes() {

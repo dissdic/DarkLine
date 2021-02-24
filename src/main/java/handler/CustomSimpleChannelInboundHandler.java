@@ -77,7 +77,7 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
         }else{
             //发送返回报文
             InetSocketAddress addr = (InetSocketAddress) channelHandlerContext.channel().remoteAddress();
-            StunMsg msg = new StunMsg(addr);
+            StunMsg msg = new StunMsg(addr).res();
             writeOnFail(channelHandlerContext.channel(),msg);
         }
 
