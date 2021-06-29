@@ -1,13 +1,16 @@
 package code.stun.handler;
 
+import dto.GeneralUtil;
 import dto.StunMsgBizType;
 import dto.VarEnums;
 import handler.CustomSimpleChannelInboundHandler;
 import io.netty.channel.Channel;
+import io.netty.handler.timeout.ReadTimeoutException;
 import pojo.StunMsg;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -23,8 +26,8 @@ public class StunUdpResponseHandler extends CustomSimpleChannelInboundHandler {
     protected void handle(ChannelHandlerContext ctx, StunMsg stunMsg) throws Exception {
         Channel channel = ctx.channel();
 
-        InetSocketAddress localAddr = (InetSocketAddress) channel.localAddress();
-        InetSocketAddress remoteAddr = (InetSocketAddress) channel.remoteAddress();
+        InetSocketAddress localAddr = new InetSocketAddress(GeneralUtil.getIp(),((InetSocketAddress)channel.localAddress()).getPort());
+        InetSocketAddress remoteAddr = Optional.ofNullable((InetSocketAddress) channel.remoteAddress()).orElse(stunMsg.getAddr());
         InetSocketAddress responseAddr = new InetSocketAddress(stunMsg.getHost(),stunMsg.getPort());
 
         System.out.println("本地地址:"+localAddr.toString());
@@ -78,7 +81,6 @@ public class StunUdpResponseHandler extends CustomSimpleChannelInboundHandler {
         }
 
     }
-
 
 
 }

@@ -11,17 +11,19 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInboundHandler<StunMsg> {
 
-    public static final ReadTimeoutHandler readTimeoutHandler = new ReadTimeoutHandler(3, TimeUnit.SECONDS);
     private static ConcurrentHashMap<Channel,StunMsg> msgMap= new ConcurrentHashMap<>();
 
+    //超时机制
     public void writeOnRetry(Channel channel,StunMsg msg){
         ChannelPipeline pipeline = channel.pipeline();
         ChannelHandler handler = pipeline.get("readTimeoutHandler");
-        if(handler==null){
-            pipeline.addLast("readTimeoutHandler",readTimeoutHandler);
+        if(handler!=null){
+            pipeline.remove("readTimeoutHandler");
         }
+        pipeline.addFirst("readTimeoutHandler",new CustomReadTimeoutHandler(5, TimeUnit.SECONDS));
         msgMap.put(channel, msg);
         if(msg.plusTimes()<=3){
+            System.out.println("发送："+msg.toString()+" 次数："+msg.getTimes());
             writeOnFail(channel,msg);
         }else{
             System.out.println("超时重传3次全部失败，关闭连接");
@@ -51,6 +53,7 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
         if(cause instanceof ReadTimeoutException){
             Channel channel = ctx.channel();
             StunMsg msg = msgMap.get(channel);
@@ -64,8 +67,11 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
 
     public void cancelReadTimeout(Channel channel){
         ChannelPipeline pipeline = channel.pipeline();
-        //去掉超时的handler
-        pipeline.remove("readTimeoutHandler");
+        ChannelHandler handler = pipeline.get("readTimeoutHandler");
+        if(handler != null){
+            //去掉超时的handler
+            pipeline.remove("readTimeoutHandler");
+        }
         //删除消息
         msgMap.remove(channel);
     }
@@ -75,13 +81,21 @@ public abstract class CustomSimpleChannelInboundHandler extends SimpleChannelInb
         if(stunMsg.isRes()) {
             cancelReadTimeout(channelHandlerContext.channel());
         }else{
+            Thread.sleep(10000);
             //发送返回报文
             InetSocketAddress addr = (InetSocketAddress) channelHandlerContext.channel().remoteAddress();
+            if(addr == null){
+                addr = stunMsg.getAddr();
+            }
             StunMsg msg = new StunMsg(addr).res();
             writeOnFail(channelHandlerContext.channel(),msg);
-        }
 
-        handle(channelHandlerContext,stunMsg);
+            handle(channelHandlerContext,stunMsg);
+        }
+    }
+
+    public void retry(Channel channel,StunMsg msg){
+
     }
 
     protected abstract void handle(ChannelHandlerContext channelHandlerContext, StunMsg stunMsg) throws Exception;
