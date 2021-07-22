@@ -8,39 +8,36 @@ import network.common.NumberUtil;
 
 import java.util.Random;
 
-public abstract class DHEncrypt implements Encrypt {
+public abstract class DHEncrypt extends AESEncrypt  {
 
-    private static final int max = 100;
+    protected static final int max = 100;
 
-    private AESEncrypt aesEncrypt = AESEncrypt.getInstance();
+    protected int p ;
+    protected int g ;
 
-    @Override
-    public byte[] encrypt(byte[] data, String publicKey) throws Exception {
-        return aesEncrypt.encrypt(data,publicKey);
+    private int privateKey;
+
+    public void setKey(int peerPubKey){
+        System.out.println(peerPubKey+" ^ "+privateKey+" mod "+p);
+        int key = (int)(Math.pow(peerPubKey,privateKey) % p);
+        this.key = String.valueOf(key);
     }
-
-    @Override
-    public byte[] decrypt(byte[] data, String privateKey) throws Exception {
-        return aesEncrypt.decrypt(data,privateKey);
+    public String getKey(){
+        return this.key;
     }
-
     @Override
     public EncryptPublicAndPrivateKey keyPair() throws Exception {
         Random random = new Random();
-        int p = random.nextInt(max);
-        while(!NumberUtil.isPrime(p)){
-            p = random.nextInt();
-        }
-        int g = GetPrime.getRootPrime(p);
-
         int privateKey = random.nextInt(max);
-
-        int publicKey = new Double(Math.pow(g,privateKey)).intValue() % p;
+        int publicKey = (int)(Math.pow(g,privateKey)% p);
+        this.privateKey = privateKey;
         EncryptPublicAndPrivateKey pubAndPri = new EncryptPublicAndPrivateKey();
         pubAndPri.setPublicKey(String.valueOf(publicKey));
         pubAndPri.setPrivateKey(String.valueOf(privateKey));
         return pubAndPri;
     }
 
-
+    public int[] getPG(){
+        return new int[]{p,g};
+    }
 }

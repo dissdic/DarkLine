@@ -1,5 +1,6 @@
 package dto.encrypt.aes;
 
+import dto.GeneralUtil;
 import dto.encrypt.Encrypt;
 import dto.encrypt.EncryptPublicAndPrivateKey;
 import exception.CustomException;
@@ -8,22 +9,26 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-public class AESEncrypt implements Encrypt {
+public abstract class AESEncrypt implements Encrypt {
 
-    private AESEncrypt(){}
-    private static final AESEncrypt instance= new AESEncrypt();
-    public static AESEncrypt getInstance(){
-        return instance;
+    protected String key;
+
+    public byte[] encrypt(byte[] data) throws Exception {
+        if(GeneralUtil.isBlank(key)){
+            throw new CustomException("对称秘钥不可以为空");
+        }
+        return encrypt(data,key);
     }
-
-    @Override
-    public EncryptPublicAndPrivateKey keyPair() throws Exception {
-
-        return null;
+    public byte[] decrypt(byte[] data) throws Exception {
+        if(GeneralUtil.isBlank(key)){
+            throw new CustomException("对称秘钥不可以为空");
+        }
+        return decrypt(data,key);
     }
 
     @Override
     public byte[] encrypt(byte[] data, String publicKey) throws Exception {
+
         if(publicKey.length()!=16){
             throw new CustomException("AES加密KEY长度不是16位");
         }
