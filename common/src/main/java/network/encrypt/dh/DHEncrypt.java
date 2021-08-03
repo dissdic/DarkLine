@@ -1,10 +1,7 @@
-package dto.encrypt.dh;
+package network.encrypt.dh;
 
-import dto.encrypt.Encrypt;
-import dto.encrypt.EncryptPublicAndPrivateKey;
-import dto.encrypt.aes.AESEncrypt;
-import network.common.GetPrime;
-import network.common.NumberUtil;
+import network.encrypt.EncryptPublicAndPrivateKey;
+import network.encrypt.aes.AESEncrypt;
 
 import java.util.Random;
 

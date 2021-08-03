@@ -1,11 +1,13 @@
 package network.common;
 
+import network.exception.Int8ByteLengthOverSIzeException;
+
 public class VariableLengthInt8Encoder {
 
     public static byte[] encode(long number){
         long max = 1L<<62-1;
         if(number > max){
-            throw new StringIndexOutOfBoundsException();
+            throw new Int8ByteLengthOverSIzeException();
         }
         int size = 1;
         int base = 8;

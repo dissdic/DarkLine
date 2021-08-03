@@ -1,4 +1,4 @@
-package dto.encrypt.dh;
+package network.encrypt.dh;
 
 public class ClientDHEncrypt extends DHEncrypt {
 

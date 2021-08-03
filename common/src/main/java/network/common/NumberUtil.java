@@ -15,6 +15,16 @@ public class NumberUtil {
         return b;
     }
 
+    public static long byteToLong(byte[] bytes){
+        long val = 0;
+        for(int i=0;i<bytes.length;i++){
+            byte bt = bytes[i];
+            long tem = ((long)(bt & 0xff)) << ((bytes.length-(i+1)) * 8);
+            val += tem;
+        }
+        return val;
+    }
+
     /*
         判断一个数是不是素数
      */
@@ -29,6 +39,10 @@ public class NumberUtil {
             }
         }
         return true;
+    }
+
+    public static double log(double value,double base){
+        return Math.log(value) / Math.log(base);
     }
 
 }

@@ -1,8 +1,7 @@
-package dto.encrypt.aes;
+package network.encrypt.aes;
 
 import dto.GeneralUtil;
-import dto.encrypt.Encrypt;
-import dto.encrypt.EncryptPublicAndPrivateKey;
+import network.encrypt.Encrypt;
 import exception.CustomException;
 
 import javax.crypto.Cipher;

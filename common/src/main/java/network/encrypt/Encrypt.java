@@ -1,6 +1,4 @@
-package dto.encrypt;
-
-import java.security.NoSuchAlgorithmException;
+package network.encrypt;
 
 public interface Encrypt {
 

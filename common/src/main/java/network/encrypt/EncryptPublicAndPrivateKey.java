@@ -1,4 +1,4 @@
-package dto.encrypt;
+package network.encrypt;
 
 public class EncryptPublicAndPrivateKey {
     //公钥

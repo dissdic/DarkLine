@@ -1,4 +1,4 @@
-package dto.encrypt.dh;
+package network.encrypt.dh;
 
 import network.common.GetPrime;
 import network.common.NumberUtil;
