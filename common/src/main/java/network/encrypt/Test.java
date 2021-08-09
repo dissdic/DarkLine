@@ -10,8 +10,9 @@ import network.encrypt.dh.ServerDHEncrypt;
 public class Test {
 
     public static void main(String[] args) throws Exception{
-
-        byte[] result = PacketNumberEncoder.encode(0x1422ac5c02123432L,0x14224a9d242342e2L);
+        long pn = 0x1422ac5c02123432L;
+        long an = 0x14224a9d242342e2L;
+        byte[] result = PacketNumberEncoder.encode(pn,an);
 
 //        long dd = VariableLengthInt8Decoder.decode(result);
         long dd = NumberUtil.byteToLong(result);
@@ -26,8 +27,6 @@ public class Test {
         int[] pg = s.getPG();
         System.out.println(pg[0]);
         System.out.println(pg[1]);
-
-
 
         EncryptPublicAndPrivateKey pair = s.keyPair();
         System.out.println(pair.getPrivateKey());

@@ -5,7 +5,7 @@ public class PacketNumberDecoder {
     public static long decode(long largestPn,long truncatePn,int bits){
 
         long expectedPn = largestPn + 1;
-        long pnWin = 1<<bits;
+        long pnWin = 1L<<bits;
         long pnHWin = pnWin/2;
         long pnMask = pnWin-1;
 
