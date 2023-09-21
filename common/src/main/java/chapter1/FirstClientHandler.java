@@ -20,24 +20,25 @@ public class FirstClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("I just send a msg");
-        ByteBuf data = ctx.channel().alloc().heapBuffer();
+        System.out.println("client:I just send a msg");
         ctx.writeAndFlush(Unpooled.copiedBuffer("send msg",CharsetUtil.UTF_8));
     }
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-        System.out.println("receive msg from server:"+byteBuf.toString(CharsetUtil.UTF_8));
-        ReferenceCountUtil.release(byteBuf);
+        System.out.println("client:receive msg from server:"+byteBuf.toString(CharsetUtil.UTF_8));
+        if(byteBuf.refCnt()>0) {
+            ReferenceCountUtil.release(byteBuf);
+        }
     }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("client channel register");
+        System.out.println("client:client channel register");
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("client channel inactive");
+        System.out.println("client:client channel inactive");
     }
 
 }

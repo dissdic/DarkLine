@@ -12,13 +12,12 @@ import java.net.InetSocketAddress;
 
 public class FirstServer {
 
-    private int port=1111;
-
     public void start() throws Exception{
         final FirstServerHandler handler = new FirstServerHandler();
         EventLoopGroup eventGroup = new NioEventLoopGroup();
         try{
             ServerBootstrap serverBootstrap = new ServerBootstrap();
+            int port = 1111;
             serverBootstrap.group(eventGroup)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(new InetSocketAddress(port))

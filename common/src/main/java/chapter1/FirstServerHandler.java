@@ -8,7 +8,7 @@ public class FirstServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("read msg");
+        System.out.println("server:read msg");
         ctx.write(msg);
 
     }

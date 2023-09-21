@@ -21,11 +21,11 @@ public class FirstClient {
             bootstrap.group(eventGroup)
                     .channel(NioSocketChannel.class)
                     .localAddress(1212)
-                    .remoteAddress(new InetSocketAddress("127.0.0.1",1234))
+                    .remoteAddress(new InetSocketAddress("127.0.0.1",1111))
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
-                            System.out.println("init a client channel");
+                            System.out.println("client:init a client channel");
                             channel.pipeline().addLast(clientCommonHandler);
                         }
                     });
@@ -41,26 +41,4 @@ public class FirstClient {
         new FirstClient().start();
     }
 
-    public void boot(){
-
-        final AttributeKey<Integer> id = AttributeKey.newInstance("id");
-        EventLoopGroup group = new NioEventLoopGroup();
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(group).localAddress(1111)
-                .channel(NioSocketChannel.class)
-                .remoteAddress(new InetSocketAddress("",9090))
-                .handler(new SimpleChannelInboundHandler<ByteBuf>() {
-                    @Override
-                    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-                        //...
-                    }
-                    @Override
-                    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-                        ctx.channel().attr(id).get();
-                    }
-                });
-        bootstrap.option(ChannelOption.SO_TIMEOUT,5000).option(ChannelOption.SO_KEEPALIVE,true);
-        bootstrap.attr(id,123);
-        bootstrap.connect();
-    }
 }
